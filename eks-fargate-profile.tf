@@ -21,6 +21,23 @@ resource "aws_eks_fargate_profile" "default" {
   ]
 }
 
+resource "aws_eks_fargate_profile" "kube_system" {
+  cluster_name           = aws_eks_cluster.main.name
+  fargate_profile_name   = "fargate-kube-system"
+  pod_execution_role_arn = aws_iam_role.fargate_pod_execution_role.arn
+  subnet_ids             = [aws_subnet.private.id]
+
+  selector {
+    namespace = "kube-system"
+  }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_iam_role_policy_attachment.fargate_execution_policy
+  ]
+}
+
+
 # Create the fargate pod execution role.
 # Roles consists of a trust policy and a permissions policy
 
