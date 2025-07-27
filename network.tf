@@ -25,7 +25,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "eu-central-1a"
+  availability_zone = "eu-central-1b"
   tags = {
     Name = "kubernetes.io/cluster/movie-picture-eks-cluster"
   }
