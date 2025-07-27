@@ -13,6 +13,16 @@ resource "aws_eks_fargate_profile" "default" {
 
   selector {
     namespace = "default"
+    labels = {
+      app = "backend"
+    }
+  }
+
+  selector {
+    namespace = "default"
+    labels = {
+      app = "frontend"
+    }
   }
 
   depends_on = [
