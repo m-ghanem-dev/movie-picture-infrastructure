@@ -1,94 +1,40 @@
-
-#########################################
-# Network
-#########################################
-
-################# VPC #################
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  tags = {
-    Name = "main-vpc"
-  }
-  enable_dns_support = true
+locals {
+  eks_cluster_name = "movie-picture-eks-cluster"
 }
 
-################# Subnets #################
-resource "aws_subnet" "public" {
-  vpc_id                 = aws_vpc.main.id
-  cidr_block             = "10.0.1.0/24"
-  availability_zone      = "eu-central-1a"
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "kubernetes.io/cluster/movie-picture-eks-cluster"
-  }
-}
+# Create VPC Terraform Module
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.4.0"
+  
+  # VPC Basic Details
+  name = local.eks_cluster_name
+  cidr = "10.0.0.0/16"  # corrected from `cidr_block`
+  azs  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]  # must be a list
 
-resource "aws_subnet" "private" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "eu-central-1b"
-  tags = {
-    Name = "kubernetes.io/cluster/movie-picture-eks-cluster"
-  }
-}
+  public_subnets  = ["10.0.1.0/24"]  # must be a list of CIDRs
+  private_subnets = ["10.0.2.0/24"]  # same here
+  
+  # NAT Gateways - Outbound Communication
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
-################# Gateways #################
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
-  tags = {
-    Name = "main-igw"
-  }
-}
+  # VPC DNS Parameters
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
-resource "aws_eip" "nat" {
-  tags = {
-    Name = "nat-eip"
+  # Additional Tags to Subnets
+  public_subnet_tags = {
+    Type = "Public Subnets"
+    "kubernetes.io/role/elb" = 1    
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"        
   }
-}
-
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
-  tags = {
-    Name = "nat-gateway"
+  private_subnet_tags = {
+    Type = "private-subnets"
+    "kubernetes.io/role/internal-elb" = 1    
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"    
   }
 
-  depends_on = [aws_internet_gateway.gw]
-}
-
-
-################# Public Route table #################
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-  tags = {
-    Name = "public-rt"
-  }
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
-  }
-}
-
-resource "aws_route_table_association" "public_assoc" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
-}
-
-################# Private Route table #################
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-  tags = {
-    Name = "private-rt"
-  }
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat.id
-  }
-}
-
-resource "aws_route_table_association" "private_assoc" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
+  # Instances launched into the Public subnet should be assigned a public IP address.
+  map_public_ip_on_launch = true  
 }

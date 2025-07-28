@@ -9,7 +9,7 @@ resource "aws_eks_fargate_profile" "default" {
   cluster_name           = aws_eks_cluster.main.name
   fargate_profile_name   = "fargate-default"
   pod_execution_role_arn = aws_iam_role.fargate_pod_execution_role.arn
-  subnet_ids             = [aws_subnet.private.id]
+  subnet_ids             = module.vpc.private_subnet
 
   selector {
     namespace = "default"
@@ -25,7 +25,7 @@ resource "aws_eks_fargate_profile" "kube_system" {
   cluster_name           = aws_eks_cluster.main.name
   fargate_profile_name   = "fargate-kube-system"
   pod_execution_role_arn = aws_iam_role.fargate_pod_execution_role.arn
-  subnet_ids             = [aws_subnet.private.id]
+  subnet_ids             = module.vpc.private_subnet
 
   selector {
     namespace = "kube-system"
