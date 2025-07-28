@@ -9,6 +9,14 @@ module "eks" {
 
   enable_irsa = true
 
+  map_users = [
+  {
+    userarn  = "arn:aws:iam::576165291816:user/mohamed"
+    username = "mohamed"
+    groups   = ["system:masters"]
+  }
+]
+
   fargate_profiles = {
     default = {
       name = "fargate-default"
