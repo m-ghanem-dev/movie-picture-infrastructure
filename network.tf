@@ -12,8 +12,8 @@ module "vpc" {
   cidr = "10.0.0.0/16"  # corrected from `cidr_block`
   azs  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]  # must be a list
 
-  public_subnets  = ["10.0.1.0/24"]  # must be a list of CIDRs
-  private_subnets = ["10.0.2.0/24"]  # same here
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
   
   # NAT Gateways - Outbound Communication
   enable_nat_gateway = true
