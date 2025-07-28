@@ -1,45 +1,33 @@
-################
-# EKS Resources
-################
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.0"
 
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster
+  cluster_name    = "movie-picture-eks-cluster"
+  cluster_version = var.k8s_version
+  vpc_id          = module.vpc.vpc_id
+  subnet_ids      = concat(module.vpc.private_subnets, module.vpc.public_subnets)
 
-resource "aws_eks_cluster" "main" {
-  name     = "movie-picture-eks-cluster"
-  version  = var.k8s_version
-  role_arn = aws_iam_role.eks_cluster.arn
+  enable_irsa = true
 
-  vpc_config {
-    subnet_ids = module.vpc.public_subnets
-    endpoint_public_access  = true
-    endpoint_private_access = true
+  # Enable the AWS Load Balancer Controller Addon
+  aws_load_balancer_controller = {
+    enable = true
+    version = "v2.7.0" # Or latest
+    namespace = "kube-system"
+    create_iam_role = true
   }
 
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_cluster
-  ]
-}
+  fargate_profiles = {
+    default = {
+      name = "fargate-default"
+      selectors = [{ namespace = "default" }]
+      subnet_ids = module.vpc.private_subnets
+    }
 
-
-# Create the eks cluster role to manage nodes
-# Roles consists of a trust policy and a permissions policy
-
-resource "aws_iam_role" "eks_cluster" {
-  name = "eks_cluster_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action = "sts:AssumeRole",
-      Effect = "Allow",
-      Principal = {
-        Service = "eks.amazonaws.com"
-      }
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cluster" {
-  role       = aws_iam_role.eks_cluster.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+    kube_system = {
+      name = "fargate-kube-system"
+      selectors = [{ namespace = "kube-system" }]
+      subnet_ids = module.vpc.private_subnets
+    }
+  }
 }
