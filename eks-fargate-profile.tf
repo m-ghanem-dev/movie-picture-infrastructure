@@ -9,7 +9,7 @@ resource "aws_eks_fargate_profile" "default" {
   cluster_name           = aws_eks_cluster.main.name
   fargate_profile_name   = "fargate-default"
   pod_execution_role_arn = aws_iam_role.fargate_pod_execution_role.arn
-  subnet_ids             = module.vpc.private_subnets
+  subnet_ids             = concat(module.vpc.private_subnets, module.vpc.public_subnets)
 
   selector {
     namespace = "default"
