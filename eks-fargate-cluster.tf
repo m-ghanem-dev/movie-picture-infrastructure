@@ -9,14 +9,6 @@ module "eks" {
 
   enable_irsa = true
 
-  map_users = [
-  {
-    userarn  = "arn:aws:iam::576165291816:user/mohamed"
-    username = "mohamed"
-    groups   = ["system:masters"]
-  }
-]
-
   fargate_profiles = {
     default = {
       name = "fargate-default"
@@ -31,3 +23,26 @@ module "eks" {
     }
   }
 }
+
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapUsers = yamlencode([
+      {
+        userarn  = "arn:aws:iam::576165291816:user/mohamed"
+        username = "mohamed"
+        groups   = ["system:masters"]
+      }
+    ])
+
+    # Optionally include existing mapRoles or mapUsers if needed
+  }
+
+  depends_on = [module.eks]
+}
+
