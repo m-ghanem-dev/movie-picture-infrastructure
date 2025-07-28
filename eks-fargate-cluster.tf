@@ -9,14 +9,6 @@ module "eks" {
 
   enable_irsa = true
 
-  # Enable the AWS Load Balancer Controller Addon
-  aws_load_balancer_controller = {
-    enable = true
-    version = "v2.7.0" # Or latest
-    namespace = "kube-system"
-    create_iam_role = true
-  }
-
   fargate_profiles = {
     default = {
       name = "fargate-default"
