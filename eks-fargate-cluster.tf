@@ -1,6 +1,6 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "21.0.4"
 
   cluster_name    = "movie-picture-eks-cluster"
   cluster_version = var.k8s_version
