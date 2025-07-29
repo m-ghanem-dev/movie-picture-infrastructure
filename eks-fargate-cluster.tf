@@ -7,8 +7,6 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = concat(module.vpc.private_subnets, module.vpc.public_subnets)
 
-  enable_irsa = true
-
   fargate_profiles = {
     default = {
       name = "fargate-default"
@@ -22,27 +20,5 @@ module "eks" {
       subnet_ids = module.vpc.private_subnets
     }
   }
-}
-
-
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-
-  data = {
-    mapUsers = yamlencode([
-      {
-        userarn  = "arn:aws:iam::576165291816:user/mohamed"
-        username = "mohamed"
-        groups   = ["system:masters"]
-      }
-    ])
-
-    # Optionally include existing mapRoles or mapUsers if needed
-  }
-
-  depends_on = [module.eks]
 }
 
