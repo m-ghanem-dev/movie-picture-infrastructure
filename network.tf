@@ -27,12 +27,12 @@ module "vpc" {
   public_subnet_tags = {
     Type = "Public Subnets"
     "kubernetes.io/role/elb" = 1    
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "owned"        
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"        
   }
   private_subnet_tags = {
     Type = "private-subnets"
     "kubernetes.io/role/internal-elb" = 1    
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "owned"    
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"    
   }
 
   # Instances launched into the Public subnet should be assigned a public IP address.
