@@ -2,7 +2,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
 
-  cluster_name    = "movie-picture-eks-cluster"
+  cluster_name    = var.eks_cluster_name
   cluster_version = var.k8s_version
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.public_subnets

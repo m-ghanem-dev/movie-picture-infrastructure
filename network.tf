@@ -1,14 +1,10 @@
-locals {
-  eks_cluster_name = "movie-picture-eks-cluster"
-}
-
 # Create VPC Terraform Module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.4.0"
   
   # VPC Basic Details
-  name = local.eks_cluster_name
+  name = var.eks_cluster_name
   cidr = "10.0.0.0/16"  # corrected from `cidr_block`
   azs  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]  # must be a list
 
