@@ -1,3 +1,3 @@
 variable "k8s_version" {
-  default = "1.32"
+  default = "1.33"
 }
