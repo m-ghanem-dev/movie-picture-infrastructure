@@ -7,24 +7,21 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = concat(module.vpc.private_subnets, module.vpc.public_subnets)
 
-  enable_irsa = true
-  enable_cluster_creator_admin_permissions= true
+  enable_irsa                                 = true
+  enable_cluster_creator_admin_permissions    = true
+  cluster_endpoint_public_access              = true
+  cluster_endpoint_private_access             = true
 
-  cluster_endpoint_public_access = true
-  cluster_endpoint_private_access = true
+  # No fargate_profiles block here
 
-  fargate_profiles = {
+  eks_managed_node_groups = {
     default = {
-      name = "fargate-default"
-      selectors = [{ namespace = "default" }]
-      subnet_ids = module.vpc.private_subnets
-    }
+      desired_capacity = 2
+      min_capacity     = 1
+      max_capacity     = 3
 
-    kube_system = {
-      name = "fargate-kube-system"
-      selectors = [{ namespace = "kube-system" }]
-      subnet_ids = module.vpc.private_subnets
+      instance_types = ["t3.medium"]
+      subnet_ids     = module.vpc.private_subnets
     }
   }
 }
-
