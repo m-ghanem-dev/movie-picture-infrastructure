@@ -5,7 +5,7 @@ module "eks" {
   cluster_name    = "movie-picture-eks-cluster"
   cluster_version = var.k8s_version
   vpc_id          = module.vpc.vpc_id
-  subnet_ids      = concat(module.vpc.private_subnets, module.vpc.public_subnets)
+  subnet_ids      = module.vpc.public_subnets
 
   enable_irsa                                 = true
   enable_cluster_creator_admin_permissions    = true
