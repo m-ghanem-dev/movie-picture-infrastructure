@@ -3,5 +3,5 @@ variable "k8s_version" {
 }
 
 variable "eks_cluster_name" {
-  default = "eks_cluster_name"
+  default = "movie-picture-eks-cluster"
 }
