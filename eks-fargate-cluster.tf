@@ -21,7 +21,7 @@ module "eks" {
       max_capacity     = 3
 
       instance_types = ["t3.medium"]
-      subnet_ids     = module.vpc.private_subnets
+      subnet_ids     = module.vpc.public_subnets
     }
   }
 }
