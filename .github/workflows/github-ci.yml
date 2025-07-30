@@ -35,7 +35,6 @@ jobs:
           path: tfplan
 
   apply:
-    if: github.actor == 'm-ghanem-dev'
     needs: plan
     runs-on: ubuntu-latest
     env:
