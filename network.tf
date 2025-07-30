@@ -5,15 +5,15 @@ module "vpc" {
   
   # VPC Basic Details
   name = var.eks_cluster_name
-  cidr = "10.0.0.0/16"  # corrected from `cidr_block`
-  azs  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]  # must be a list
+  cidr = "10.0.0.0/16"
+  azs  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+  # private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
   
   # NAT Gateways - Outbound Communication
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  # enable_nat_gateway = true
+  # single_nat_gateway = true
 
   # VPC DNS Parameters
   enable_dns_hostnames = true
